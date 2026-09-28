@@ -5,7 +5,7 @@
 ![CSS](https://img.shields.io/badge/animation-pure%20CSS-3fb950?style=flat)
 ![Size](https://img.shields.io/badge/eq.js-~1%20KB-777BB4?style=flat)
 
-**[Try it live](https://bryanhamiltondev.github.io/eq-visualizer/demo/)** - the hosted demo, bars dancing and all.
+**[Try it live](https://bryanhamiltondev.github.io/eq-visualizer/demo/)** - click the card once, hover, and a real 30-second preview plays while the EQ dances to the actual frequencies.
 
 The 8-bar sensory equalizer from [The DJ Calendar](https://thedjcalendar.com),
 extracted as a standalone, open-source widget. On the homepage it plays one
@@ -13,11 +13,13 @@ role: it waits hidden inside every artist card and fades in when you roll over
 the photo - part of the full listening overlay, anchored along the bottom edge
 of the card.
 
-> **Hearing things?** The homepage hover preview - the one that actually
-> *plays* music, with an EQ driven by the real audio frequencies via Web
-> Audio - lives in its own repo:
+> **The full audio experience?** The homepage hover preview - the one that
+> looks up any artist's track via the iTunes Search API, caches the preview
+> URL, wires media session metadata and document-title swapping, and degrades
+> gracefully - lives in its own repo:
 > [dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview).
-> This repo is the decorative, pure-CSS member of the family.
+> This repo is the widget member of the family; the demo card's audio half is
+> ported from it.
 
 ## The opinion underneath it
 
@@ -88,30 +90,35 @@ with a 4px gap span the full width, 40px tall:
   pointer-events: none;
 }
 
-.card-eq {
+.waveform-canvas {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: 100%;
+  height: 40px;
   opacity: 0;
-  transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
 .card-image:hover .card-overlay,
-.card-image:hover .card-eq { opacity: 1; }
+.card-image:hover .waveform-canvas { opacity: 1; }
 ```
 
-The demo renders this reveal with the CSS bars in the site's neon cyan,
-gradient-faded to transparent at the bottom to match the canvas rendering.
 (:focus is this repo's addition - keyboard visitors get the same reveal,
 not just mouse users.)
 
-On the live site the card EQ is canvas, driven by the real audio frequencies
-via Web Audio - that half lives in
-[dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview),
-which ships the full card treatment: real photo, rank badge, audio preview,
-and the frequency-driven bars.
+On the live site (and in this repo's demo card) the bars are canvas, driven
+by the REAL audio frequencies: an iTunes 30-second preview plays through a
+Web Audio `AnalyserNode` (`fftSize: 64`, `smoothingTimeConstant: 0.8`), and
+each bar reads `dataArray[i * 2]` - bass lives in the low indices, so the
+left bars dance hardest. The full production version - iTunes Search lookup,
+URL caching, generation-counter race guards, media session metadata - is
+[dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview).
+
+One quirk the demo reproduces honestly: browsers block audio until the
+visitor interacts with the page, so the card asks for **one click first**,
+then every hover after that plays. That's not a bug in the demo - it's the
+autoplay policy, discovered live in production and designed around.
 
 ## Accessibility
 
