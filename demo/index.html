@@ -47,7 +47,7 @@
   .card-image:hover .card-eq,
   .card-image:focus .card-eq { opacity: 1; }
 
-  /* the card itself - a stage-photo placeholder, no image assets needed */
+  /* the card - a real artist photo, with the gradient kept underneath as fallback */
   .dj-card {
     display: block;
     width: 280px;
@@ -59,10 +59,12 @@
   .card-photo {
     height: 170px;
     border-radius: 10px;
-    background:
+    background-image:
+      url('https://cdn-images.dzcdn.net/images/artist/a159a05bd05255371563fb0ecdbe2016/500x500-000000-80-0-0.jpg'),
       radial-gradient(120px 80px at 70% 30%, rgba(0, 210, 255, 0.25), transparent 70%),
-      radial-gradient(200px 140px at 30% 80%, rgba(0, 210, 255, 0.12), transparent 70%),
       linear-gradient(160deg, #10141f 0%, #1c2333 55%, #0a0d14 100%);
+    background-size: cover;
+    background-position: center;
     position: relative;
   }
   .card-photo::after {
@@ -88,7 +90,10 @@
     right: 14px;
     z-index: 2;
     font: 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
-    color: #8b949e;
+    color: #e6edf3;
+    background: rgba(13, 17, 23, 0.7);
+    padding: 4px 8px;
+    border-radius: 4px;
   }
 </style>
 </head>
@@ -133,10 +138,10 @@
 
   <section>
     <h2>Hover reveal - the homepage pattern</h2>
-    <p class="label" style="min-width: 0; margin-bottom: 16px;">roll over the card - the EQ fades in, neon cyan, like the homepage</p>
-    <a class="dj-card card-image" href="https://thedjcalendar.com">
+    <p class="label" style="min-width: 0; margin-bottom: 16px;">roll over the card - the EQ fades in over the photo; roll out and it fades back to nothing</p>
+    <a class="dj-card card-image" href="https://thedjcalendar.com" aria-label="Above &amp; Beyond on The DJ Calendar - hovering shows the equalizer">
       <span class="card-photo">
-        <span class="card-name">Charlotte de Witte</span>
+        <span class="card-name">Above &amp; Beyond</span>
         <span class="card-hint">hover</span>
       </span>
       <span class="card-eq">
