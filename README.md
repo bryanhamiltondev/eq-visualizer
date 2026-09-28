@@ -14,6 +14,12 @@ alive and the music is moving. On the homepage it plays a different role:
 it waits hidden inside every artist card and fades in when you roll over
 the photo.
 
+> **Hearing things?** The homepage hover preview - the one that actually
+> *plays* music, with an EQ driven by the real audio frequencies via Web
+> Audio - lives in its own repo:
+> [dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview).
+> This repo is the decorative, pure-CSS member of the family.
+
 ## The opinion underneath it
 
 An equalizer next to a DJ's name is a promise: this page is about sound.
@@ -90,6 +96,10 @@ you to the artist:
 The demo renders this reveal with the CSS bars in the site's neon cyan.
 (:focus is this repo's addition - keyboard visitors get the same reveal,
 not just mouse users.)
+
+For the full homepage card treatment - real photo, rank badge, audio
+preview, and the frequency-driven EQ - see
+[dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview).
 
 ## Accessibility
 
