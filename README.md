@@ -76,7 +76,7 @@ holds it at `opacity: 0`, and on hover the whole reveal fades in together:
 a 75% black overlay with the "you are now listening to" label and track,
 plus the EQ as a full-width strip flush to the bottom edge of the photo.
 The production geometry is exact: on a 280px card, eight bars at 31.5px
-with a 4px gap span the full width, 40px tall:
+with a 4px gap span the full width, 80px tall:
 
 ```css
 .card-image { position: relative; overflow: hidden; }
@@ -95,7 +95,7 @@ with a 4px gap span the full width, 40px tall:
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 40px;
+  height: 80px;
   opacity: 0;
   pointer-events: none;
 }
