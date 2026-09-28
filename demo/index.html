@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eq-visualizer - demo</title>
+<link rel="stylesheet" href="../src/eq.css">
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0;
+    padding: 48px 24px;
+    background: #0d1117;
+    color: #e6edf3;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  h1 span { color: #3fb950; }
+  p.lead { color: #8b949e; margin: 0 0 40px; }
+  section { margin: 0 0 40px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #8b949e; margin: 0 0 16px; }
+  .row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .label { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: #8b949e; min-width: 190px; }
+  /* the artist-header pattern from The DJ Calendar: name first, EQ inline after */
+  .artist { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>eq<span>-</span>visualizer</h1>
+  <p class="lead">The 8-bar sensory equalizer from The DJ Calendar, extracted as a zero-dependency widget. Pure CSS animation. This demo is the documentation that moves.</p>
+
+  <section>
+    <h2>Default</h2>
+    <div class="row">
+      <span class="label">&lt;span data-eq&gt;&lt;/span&gt;</span>
+      <span data-eq></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Knobs</h2>
+    <div class="row">
+      <span class="label">color #0A66C2</span>
+      <span data-eq data-eq-color="#0A66C2"></span>
+    </div>
+    <div class="row">
+      <span class="label">color #f85149, speed 0.6s</span>
+      <span data-eq data-eq-color="#f85149" data-eq-speed="0.6"></span>
+    </div>
+    <div class="row">
+      <span class="label">height 48px, width 9px</span>
+      <span data-eq data-eq-height="48" data-eq-width="9"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>In context - the artist-header pattern</h2>
+    <div class="row">
+      <span class="artist">CHARLOTTE DE WITTE <span data-eq data-eq-height="20"></span></span>
+    </div>
+    <div class="row">
+      <span class="artist" style="font-size: 17px;">Amelie Lens <span data-eq data-eq-height="14" data-eq-width="4"></span></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>No-JavaScript mode</h2>
+    <div class="row">
+      <span class="label">hand-written bars, no eq.js</span>
+      <span class="eq" role="img" aria-label="equalizer">
+        <span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span><span class="eq__bar"></span>
+      </span>
+    </div>
+  </section>
+
+  <p class="lead" style="margin-top:56px">Resize your system motion settings to reduced and the bars settle to a calm, static meter - by design, with zero JavaScript involved.</p>
+</main>
+<script src="../src/eq.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+/*!
+ * eq-visualizer - the 8-bar sensory equalizer
+ * Zero dependencies. Pure CSS animation. Respects prefers-reduced-motion.
+ * https://github.com/bryanhamiltondev/eq-visualizer
+ * MIT licensed.
+ */
+
+.eq {
+  /* knob panel - override any of these without touching the rules below */
+  --eq-color: #3fb950;
+  --eq-height: 28px;
+  --eq-bar-width: 5px;
+  --eq-gap: 4px;
+  --eq-speed: 1.1s;
+
+  display: inline-flex;
+  align-items: flex-end;
+  gap: var(--eq-gap);
+  height: var(--eq-height);
+}
+
+.eq__bar {
+  width: var(--eq-bar-width);
+  border-radius: 2px 2px 0 0;
+  background: var(--eq-color);
+  transform-origin: bottom;
+  animation: eq-dance var(--eq-speed) ease-in-out infinite;
+}
+
+/*
+ * Eight bars, eight temperaments. Duration multipliers and negative delays
+ * desynchronize the bars so the motion reads organic, not metronomic.
+ * No JavaScript is involved in the animation.
+ */
+.eq__bar:nth-child(1) { animation-duration: calc(var(--eq-speed) * 0.82); animation-delay: -0.05s; }
+.eq__bar:nth-child(2) { animation-duration: calc(var(--eq-speed) * 1.18); animation-delay: -0.21s; }
+.eq__bar:nth-child(3) { animation-duration: calc(var(--eq-speed) * 0.68); animation-delay: -0.37s; }
+.eq__bar:nth-child(4) { animation-duration: calc(var(--eq-speed) * 1.00); animation-delay: -0.09s; }
+.eq__bar:nth-child(5) { animation-duration: calc(var(--eq-speed) * 0.77); animation-delay: -0.44s; }
+.eq__bar:nth-child(6) { animation-duration: calc(var(--eq-speed) * 1.24); animation-delay: -0.16s; }
+.eq__bar:nth-child(7) { animation-duration: calc(var(--eq-speed) * 0.90); animation-delay: -0.28s; }
+.eq__bar:nth-child(8) { animation-duration: calc(var(--eq-speed) * 1.06); animation-delay: -0.52s; }
+
+@keyframes eq-dance {
+  0%, 100% { transform: scaleY(0.25); }
+  30%      { transform: scaleY(0.95); }
+  55%      { transform: scaleY(0.45); }
+  80%      { transform: scaleY(0.75); }
+}
+
+/*
+ * Motion is a pleasure, not a requirement. Visitors who ask the OS for
+ * reduced motion get a calm, static meter at listening volume.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .eq__bar {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}
