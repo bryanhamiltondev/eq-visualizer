@@ -6,7 +6,7 @@
 <title>eq-visualizer - demo</title>
 <link rel="stylesheet" href="../src/eq.css">
 <style>
-  :root { color-scheme: dark; }
+  :root { color-scheme: dark; --neon: #00d2ff; }
   body {
     margin: 0;
     padding: 48px 24px;
@@ -27,9 +27,9 @@
 
   /*
    * The homepage hover-reveal pattern.
-   * Production values: opacity 0 at rest, 0.3s ease fade on hover,
-   * pointer-events: none so the meter never intercepts the click.
-   * :focus keeps keyboard visitors in on the reveal.
+   * At rest: photo, name, rank. On hover: the EQ fades in and the
+   * track name appears under the artist's name. Production values:
+   * opacity 0 at rest, 0.3s ease both ways, pointer-events: none.
    */
   .card-image { position: relative; overflow: hidden; }
   .card-eq {
@@ -47,7 +47,7 @@
   .card-image:hover .card-eq,
   .card-image:focus .card-eq { opacity: 1; }
 
-  /* the card - a real artist photo, with the gradient kept underneath as fallback */
+  /* the card - homepage dj-card treatment: photo, name, rank badge */
   .dj-card {
     display: block;
     width: 280px;
@@ -57,32 +57,38 @@
     outline-offset: 3px;
   }
   .card-photo {
-    height: 170px;
+    display: block;
+    height: 340px;
     border-radius: 10px;
     background-image:
-      url('https://cdn-images.dzcdn.net/images/artist/a159a05bd05255371563fb0ecdbe2016/500x500-000000-80-0-0.jpg'),
+      url('https://cdn-images.dzcdn.net/images/artist/2d527fa03e106ed82a28f161694278d3/500x500-000000-80-0-0.jpg'),
       radial-gradient(120px 80px at 70% 30%, rgba(0, 210, 255, 0.25), transparent 70%),
       linear-gradient(160deg, #10141f 0%, #1c2333 55%, #0a0d14 100%);
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     position: relative;
   }
   .card-photo::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent 55%);
+    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 45%, transparent 70%);
     border-radius: 10px;
   }
-  .card-name {
+  .card-rank {
     position: absolute;
-    bottom: 14px;
-    left: 16px;
+    top: 12px;
+    left: 14px;
     z-index: 2;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    font-size: 15px;
+    padding: 4px 10px;
+    border: 1.5px solid var(--neon);
+    border-radius: 4px;
+    color: var(--neon);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
     text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.55);
   }
   .card-hint {
     position: absolute;
@@ -94,6 +100,44 @@
     background: rgba(13, 17, 23, 0.7);
     padding: 4px 8px;
     border-radius: 4px;
+  }
+  /* name + track, anchored above the EQ zone */
+  .card-meta {
+    position: absolute;
+    bottom: 46px;
+    left: 16px;
+    right: 16px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .card-name {
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    font-size: 18px;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .card-track {
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease;
+    color: var(--neon);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .card-image:hover .card-track,
+  .card-image:focus .card-track {
+    margin-top: 6px;
+    max-height: 20px;
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
 </head>
@@ -137,12 +181,16 @@
   </section>
 
   <section>
-    <h2>Hover reveal - the homepage pattern</h2>
-    <p class="label" style="min-width: 0; margin-bottom: 16px;">roll over the card - the EQ fades in over the photo; roll out and it fades back to nothing</p>
-    <a class="dj-card card-image" href="https://thedjcalendar.com" aria-label="Above &amp; Beyond on The DJ Calendar - hovering shows the equalizer">
+    <h2>Hover reveal - the homepage card</h2>
+    <p class="label" style="min-width: 0; margin-bottom: 16px;">photo and rank at rest - roll over and the EQ plays while the track name slides in under his name; roll out and it all settles back</p>
+    <a class="dj-card card-image" href="https://thedjcalendar.com/davidguetta" aria-label="David Guetta, rank 1, on The DJ Calendar - hovering shows the equalizer and his top track">
       <span class="card-photo">
-        <span class="card-name">Above &amp; Beyond</span>
+        <span class="card-rank">#1</span>
         <span class="card-hint">hover</span>
+        <span class="card-meta">
+          <span class="card-name">David Guetta</span>
+          <span class="card-track">Titanium (feat. Sia)</span>
+        </span>
       </span>
       <span class="card-eq">
         <span data-eq data-eq-color="#00d2ff" data-eq-height="26"></span>
