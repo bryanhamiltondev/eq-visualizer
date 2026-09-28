@@ -5,6 +5,8 @@
 ![CSS](https://img.shields.io/badge/animation-pure%20CSS-3fb950?style=flat)
 ![Size](https://img.shields.io/badge/eq.js-~1%20KB-777BB4?style=flat)
 
+**[Try it live](https://bryanhamiltondev.github.io/eq-visualizer/demo/)** - the hosted demo, bars dancing and all.
+
 The 8-bar sensory equalizer from [The DJ Calendar](https://thedjcalendar.com),
 extracted as a standalone, open-source widget. It sits inline next to every
 artist name on the site - a small, always-dancing signal that the page is
