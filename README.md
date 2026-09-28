@@ -8,11 +8,10 @@
 **[Try it live](https://bryanhamiltondev.github.io/eq-visualizer/demo/)** - the hosted demo, bars dancing and all.
 
 The 8-bar sensory equalizer from [The DJ Calendar](https://thedjcalendar.com),
-extracted as a standalone, open-source widget. It sits inline next to every
-artist name on the site - a small, always-dancing signal that the page is
-alive and the music is moving. On the homepage it plays a different role:
-it waits hidden inside every artist card and fades in when you roll over
-the photo.
+extracted as a standalone, open-source widget. On the homepage it plays one
+role: it waits hidden inside every artist card and fades in when you roll over
+the photo - part of the full listening overlay, anchored along the bottom edge
+of the card.
 
 > **Hearing things?** The homepage hover preview - the one that actually
 > *plays* music, with an EQ driven by the real audio frequencies via Web
@@ -65,19 +64,29 @@ Set per-instance with data attributes (Option A) or CSS custom properties (eithe
 | Tempo | `data-eq-speed` | `--eq-speed` | `1.1s` |
 
 ```html
-<span data-eq data-eq-color="#0A66C2" data-eq-height="48" data-eq-speed="0.6"></span>
+<span data-eq data-eq-color="#0A66C2" data-eq-speed="0.6"></span>
 ```
 
 ## The hover reveal (homepage pattern)
 
 On the homepage, the equalizer waits until you earn it. Each artist card
-holds it at `opacity: 0` and fades it in over the photo on hover. The
-reveal values below are the production ones - a 0.3s ease fade, and
-`pointer-events: none` so the meter never intercepts the click that takes
-you to the artist:
+holds it at `opacity: 0`, and on hover the whole reveal fades in together:
+a 75% black overlay with the "you are now listening to" label and track,
+plus the EQ as a full-width strip flush to the bottom edge of the photo.
+The production geometry is exact: on a 280px card, eight bars at 31.5px
+with a 4px gap span the full width, 40px tall:
 
 ```css
 .card-image { position: relative; overflow: hidden; }
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
 
 .card-eq {
   position: absolute;
@@ -89,17 +98,20 @@ you to the artist:
   pointer-events: none;
 }
 
-.card-image:hover .card-eq,
-.card-image:focus .card-eq { opacity: 1; }
+.card-image:hover .card-overlay,
+.card-image:hover .card-eq { opacity: 1; }
 ```
 
-The demo renders this reveal with the CSS bars in the site's neon cyan.
+The demo renders this reveal with the CSS bars in the site's neon cyan,
+gradient-faded to transparent at the bottom to match the canvas rendering.
 (:focus is this repo's addition - keyboard visitors get the same reveal,
 not just mouse users.)
 
-For the full homepage card treatment - real photo, rank badge, audio
-preview, and the frequency-driven EQ - see
-[dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview).
+On the live site the card EQ is canvas, driven by the real audio frequencies
+via Web Audio - that half lives in
+[dj-card-preview](https://github.com/bryanhamiltondev/dj-card-preview),
+which ships the full card treatment: real photo, rank badge, audio preview,
+and the frequency-driven bars.
 
 ## Accessibility
 
@@ -118,9 +130,9 @@ and settle to a calm, static meter. No JavaScript required to be polite.
 ## Origin
 
 Extracted from The DJ Calendar (https://thedjcalendar.com), where it runs
-inline on every artist page and as the hover reveal on homepage cards.
-Like everything published under this account, it is a production-derived
-pattern: what ships here is the idea, not the infrastructure.
+as the hover reveal inside the homepage artist cards. Like everything
+published under this account, it is a production-derived pattern: what ships
+here is the idea, not the infrastructure.
 
 ## License
 
