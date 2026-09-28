@@ -24,13 +24,14 @@
   .label { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: #8b949e; min-width: 190px; }
 
   /*
-   * The homepage hover-reveal pattern, matched to the live site.
-   * At rest: photo, rank badge, name. On hover: the 75% black overlay fades
-   * in with the "you are now listening to" label and track, and the EQ
-   * plays along the full width of the bottom edge. Production geometry:
-   * 8 bars across the 280px card, 31.5px bar + 4px gap = 280px exactly,
-   * 40px tall, flush to the bottom. Production values: opacity 0 at rest,
-   * 0.3s ease both ways, pointer-events: none.
+   * The homepage hover-reveal card, matched to the live site.
+   * At rest: photo, rank badge, name. On hover (after the first click,
+   * browser autoplay policy): the 75% black overlay fades in with the
+   * "you are now listening to" label and track, a 30-second preview plays,
+   * and the canvas EQ driven by the REAL audio frequencies runs along the
+   * full width of the bottom edge. Production geometry: 8 bars across the
+   * 280px card, 31.5px bar + 4px gap = 280px exactly, 40px tall, flush to
+   * the bottom. Bars: #00d2ff gradient fading to transparent at the bottom.
    */
   .card-image { position: relative; overflow: hidden; }
   .card-overlay {
@@ -50,7 +51,8 @@
     pointer-events: none;
   }
   .card-image:hover .card-overlay,
-  .card-image:focus .card-overlay { opacity: 1; }
+  .card-image:focus .card-overlay,
+  .card-image.is-preview-playing .card-overlay { opacity: 1; }
   .card-overlay-label {
     font-size: 11px;
     letter-spacing: 0.2em;
@@ -63,25 +65,15 @@
     color: #ffffff;
     line-height: 1.3;
   }
-  .card-eq {
+  .waveform-canvas {
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 0;
     z-index: 3;
-    display: flex;
-    justify-content: center;
+    width: 100%;
+    height: 40px;
     opacity: 0;
-    transition: opacity 0.3s ease;
     pointer-events: none;
-  }
-  .card-image:hover .card-eq,
-  .card-image:focus .card-eq { opacity: 1; }
-  /* demo-only: production renders these bars on canvas with a cyan gradient
-     that fades to transparent at the bottom - reproduce it so the CSS stand-in
-     reads like the real thing */
-  .card-eq .eq__bar {
-    background: linear-gradient(180deg, #00d2ff 0%, rgba(0, 210, 255, 0) 100%);
   }
 
   /* the card - homepage dj-card treatment: photo, name below, rank badge */
@@ -176,22 +168,20 @@
 
   <section>
     <h2>Hover reveal - the homepage card</h2>
-    <p class="label" style="min-width: 0; margin-bottom: 16px;">photo and rank at rest - roll over and the overlay fades in with "you are now listening to" while the full-width EQ plays along the bottom edge, exactly like the live homepage; roll out and it all settles back</p>
-    <a class="dj-card card-image" href="https://thedjcalendar.com/davidguetta" aria-label="David Guetta, rank 1, on The DJ Calendar - hovering shows the listening overlay and the equalizer">
+    <p class="label" style="min-width: 0; margin-bottom: 16px;">the production behavior: click the card once (browser autoplay policy), then roll over - the 30-second preview plays, the overlay fades in with "you are now listening to", and the canvas EQ dances to the REAL audio frequencies along the bottom edge; roll out and everything stops</p>
+    <a class="dj-card card-image" id="guetta-card" href="https://thedjcalendar.com/davidguetta" aria-label="David Guetta, rank 1, on The DJ Calendar - click once, then hover to play a preview with the audio equalizer">
       <span class="card-photo">
         <span class="card-rank">#1</span>
-        <span class="card-hint">hover</span>
+        <span class="card-hint">click once</span>
         <span class="card-overlay">
           <span class="card-overlay-label">You are now listening to:</span>
           <span class="card-overlay-track">Titanium (feat. Sia)</span>
         </span>
-        <span class="card-eq">
-          <span data-eq data-eq-color="#00d2ff" data-eq-height="40" data-eq-width="31.5"></span>
-        </span>
+        <canvas class="waveform-canvas" width="280" height="40" aria-hidden="true"></canvas>
       </span>
       <span class="dj-card-name">David Guetta</span>
     </a>
-    <p class="label" style="min-width: 0; margin-top: 16px;">on the live site these bars are canvas, driven by the real audio frequencies via Web Audio - that half lives in <a href="https://github.com/bryanhamiltondev/dj-card-preview" style="color: var(--neon);">dj-card-preview</a></p>
+    <p class="label" style="min-width: 0; margin-top: 16px;">this card's audio half is ported from <a href="https://github.com/bryanhamiltondev/dj-card-preview" style="color: var(--neon);">dj-card-preview</a>, the production-verbatim extraction: iTunes preview + Web Audio analyser (fftSize 64, smoothing 0.8) driving 8 canvas bars from dataArray[i*2]</p>
   </section>
 
   <section>
@@ -207,5 +197,121 @@
   <p class="lead" style="margin-top:56px">Resize your system motion settings to reduced and the bars settle to a calm, static meter - by design, with zero JavaScript involved.</p>
 </main>
 <script src="../src/eq.js"></script>
+<script>
+/* Demo-only audio half, ported from dj-card-preview src/dj-card-preview.js
+   (production-verbatim). Differences from production: the preview URL is
+   hardcoded (no iTunes Search lookup) and there is a single card instead of
+   the grid-delegated hover binding. */
+(function () {
+  var card = document.getElementById('guetta-card');
+  if (!card) return;
+  var canvas = card.querySelector('.waveform-canvas');
+  var hint = card.querySelector('.card-hint');
+  var PREVIEW_URL = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/dd/8f/45dd8ffc-0164-1f70-c53d-bf91a1d80b1a/mzaf_3092057092144618662.plus.aac.p.m4a';
+
+  var enabled = false;
+  var audio = null, ctx = null, analyser = null, dataArray = null;
+  var rafId = null, gen = 0;
+
+  var touchMode = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  var motionOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function setPlaying(playing) {
+    card.classList.toggle('is-preview-playing', !!playing);
+  }
+
+  function stopPreview() {
+    gen++;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (audio) {
+      try { audio.pause(); audio.removeAttribute('src'); audio.load(); } catch (e) {}
+      audio = null;
+    }
+    if (ctx) {
+      try { if (ctx.state !== 'closed' && typeof ctx.close === 'function') ctx.close(); } catch (e2) {}
+      ctx = null;
+    }
+    analyser = null;
+    var c2d = canvas.getContext('2d');
+    if (c2d) c2d.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.opacity = '0';
+    setPlaying(false);
+  }
+
+  function draw() {
+    if (!audio || !analyser) { rafId = null; return; }
+    rafId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+    var c2d = canvas.getContext('2d');
+    c2d.clearRect(0, 0, canvas.width, canvas.height);
+    var BAR_COUNT = 8, gap = 4;
+    var barWidth = (canvas.width - gap * (BAR_COUNT - 1)) / BAR_COUNT;
+    for (var i = 0; i < BAR_COUNT; i++) {
+      var avg = dataArray[i * 2] || 0;
+      var barHeight = Math.max(4, (avg / 255) * canvas.height);
+      var x = i * (barWidth + gap);
+      var y = canvas.height - barHeight;
+      var grad = c2d.createLinearGradient(x, y, x, canvas.height);
+      grad.addColorStop(0, '#00d2ff');
+      grad.addColorStop(1, 'rgba(0,210,255,0)');
+      c2d.fillStyle = grad;
+      c2d.fillRect(x, y, barWidth, barHeight);
+    }
+  }
+
+  function playPreview() {
+    if (!enabled || !motionOk || audio) return;
+    var myGen = ++gen;
+    var a = new Audio();
+    a.crossOrigin = 'anonymous';
+    a.src = PREVIEW_URL;
+    audio = a;
+    a.addEventListener('ended', stopPreview);
+    a.addEventListener('error', stopPreview);
+
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) {
+      try {
+        ctx = new Ctx();
+        var src = ctx.createMediaElementSource(a);
+        analyser = ctx.createAnalyser();
+        analyser.fftSize = 64;
+        analyser.smoothingTimeConstant = 0.8;
+        src.connect(analyser);
+        analyser.connect(ctx.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      } catch (e) { ctx = null; analyser = null; }
+    }
+
+    canvas.style.opacity = '1';
+    if (analyser) draw();
+
+    var resume = (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function')
+      ? ctx.resume() : Promise.resolve();
+    Promise.resolve(resume).then(function () { return a.play(); }).then(function () {
+      if (myGen === gen) setPlaying(true);
+    }).catch(function () {
+      if (myGen === gen) setPlaying(true);
+    });
+  }
+
+  card.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (!enabled) {
+      enabled = true;
+      hint.textContent = touchMode ? 'tap again to listen' : 'hover to listen';
+      return;
+    }
+    if (touchMode) {
+      if (audio) { stopPreview(); } else { playPreview(); }
+    }
+  });
+
+  if (!touchMode) {
+    card.addEventListener('mouseenter', function () { playPreview(); });
+    card.addEventListener('mouseleave', stopPreview);
+  }
+})();
+</script>
 </body>
 </html>
