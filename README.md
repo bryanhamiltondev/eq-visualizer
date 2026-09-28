@@ -10,7 +10,9 @@
 The 8-bar sensory equalizer from [The DJ Calendar](https://thedjcalendar.com),
 extracted as a standalone, open-source widget. It sits inline next to every
 artist name on the site - a small, always-dancing signal that the page is
-alive and the music is moving.
+alive and the music is moving. On the homepage it plays a different role:
+it waits hidden inside every artist card and fades in when you roll over
+the photo.
 
 ## The opinion underneath it
 
@@ -60,6 +62,35 @@ Set per-instance with data attributes (Option A) or CSS custom properties (eithe
 <span data-eq data-eq-color="#0A66C2" data-eq-height="48" data-eq-speed="0.6"></span>
 ```
 
+## The hover reveal (homepage pattern)
+
+On the homepage, the equalizer waits until you earn it. Each artist card
+holds it at `opacity: 0` and fades it in over the photo on hover. The
+reveal values below are the production ones - a 0.3s ease fade, and
+`pointer-events: none` so the meter never intercepts the click that takes
+you to the artist:
+
+```css
+.card-image { position: relative; overflow: hidden; }
+
+.card-eq {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card-image:hover .card-eq,
+.card-image:focus .card-eq { opacity: 1; }
+```
+
+The demo renders this reveal with the CSS bars in the site's neon cyan.
+(:focus is this repo's addition - keyboard visitors get the same reveal,
+not just mouse users.)
+
 ## Accessibility
 
 The bars are decorative and marked `aria-hidden` by the injector; if you
@@ -76,10 +107,10 @@ and settle to a calm, static meter. No JavaScript required to be polite.
 
 ## Origin
 
-Extracted from The DJ Calendar (https://thedjcalendar.com), where it runs on
-every artist page. Like everything published under this account, it is a
-production-derived pattern: what ships here is the idea, not the
-infrastructure.
+Extracted from The DJ Calendar (https://thedjcalendar.com), where it runs
+inline on every artist page and as the hover reveal on homepage cards.
+Like everything published under this account, it is a production-derived
+pattern: what ships here is the idea, not the infrastructure.
 
 ## License
 
