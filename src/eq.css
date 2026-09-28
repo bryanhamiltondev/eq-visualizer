@@ -9,7 +9,7 @@
   /* knob panel - override any of these without touching the rules below */
   --eq-color: #3fb950;
   --eq-height: 28px;
-  --eq-bar-width: 5px;
+  --eq-width: 5px;
   --eq-gap: 4px;
   --eq-speed: 1.1s;
 
@@ -20,7 +20,7 @@
 }
 
 .eq__bar {
-  width: var(--eq-bar-width);
+  width: var(--eq-width);
   border-radius: 2px 2px 0 0;
   background: var(--eq-color);
   transform-origin: bottom;
